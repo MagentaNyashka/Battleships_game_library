@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef BATTLESHIPS_H
 #define BATTLESHIPS_H
 
@@ -10,6 +9,12 @@
 #include <cmath>
 #include <ctime>
 #include <string>
+#include <cassert>
+
+enum teams
+{
+    RED = 0, GREEN, BLUE, YELLOW
+};
 
 class Weapon {
 public:
@@ -35,8 +40,10 @@ protected:
     Coordinates shipCoordinates;
     std::vector<Weapon*> Weapons;
     double armourHeal;
+    bool madeMove;
+    int team;
 public:
-    Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& x, const double& y, const double& z, const double& armourHeal);
+    Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& x, const double& y, const double& z, const double& armourHeal, const int& team);
     void Move(double& x, double& y, double& z);
     double getDistance(class Ship& target) const;
     void shootTheTarget(class Ship& target);
@@ -45,12 +52,29 @@ public:
     double getBodyPoints();
     void Heal();
     std::string info() const;
+    void refreshMove();
+    bool moveStatus() const;
+    void makeMove();
     ~Ship();
 };
 
+class TEAM;
+
 class LIST {
 public:
-    static std::vector<class Ship*> shipList;
+    static std::vector<TEAM*> Teams;
+    static int teamsCount;
+};
+
+class TEAM {
+private:
+    double credits;
+    double creditsPerTurnMultiplier;
+    double shieldRegenMultiplier;
+    int maxShips;
+public:
+    TEAM(const int& i);
+    std::vector<Ship*> shipList;
 };
 
 class Laser : public Weapon {
@@ -98,32 +122,33 @@ public:
 
 class Frigate : public Ship {
 public:
-    Frigate();
+    Frigate(const int& team);
 };
 
 class Armadillo : public Ship {
 public:
-    Armadillo();
+    Armadillo(const int& team);
 };
 
 class Destroyer : public Ship {
 public:
-    Destroyer();
+    Destroyer(const int& team);
 };
 
 class Battleship : public Ship {
 public:
-    Battleship();
+    Battleship(const int& team);
 };
 
 class UI {
 public:
-    static void listShips();
+    static void listShips(const int& turn);
     static void mainMenu();
-    static void createShip();
-    static void moveShip();
-    static void shootTarget();
+    static void createShip(const int& turn);
+    static void moveShip(const int& turn);
+    static void shootTarget(const int& turn);
     static void removeDestroyedShips();
+    static void refreshMoves();
 };
 
 #endif // BATTLESHIPS_H
