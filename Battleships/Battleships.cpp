@@ -327,12 +327,11 @@ Battleship::Battleship(const int& team) : Ship("Cutie >///<", 500, 1000, 2000, 1
 
 void UI::listShips(const int& turn) {
     system("cls");
-    for (TEAM* team : LIST::Teams) {
-        for (int i = 0; i < team->shipList.size(); i++) {
-            std::cout << "[" << i << "]" << team->shipList[i]->info() << std::endl;
-        }
-        std::cout << std::endl;
+    TEAM* team = LIST::Teams[turn];
+    for (int i = 0; i < team->shipList.size(); i++) {
+       std::cout << "[" << i << "]" << team->shipList[i]->info() << std::endl;
     }
+    std::cout << std::endl;
     /*
     for (int i = 0; i < LIST::Teams[turn]->shipList.size(); i++) {
         std::cout << "[" << i << "]" << LIST::Teams[turn]->shipList[i]->info() << std::endl;
