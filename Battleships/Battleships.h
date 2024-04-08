@@ -75,6 +75,19 @@ private:
 public:
     TEAM(const int& i);
     std::vector<Ship*> shipList;
+    void setCredits(const double& credits);
+    void addCredits(const double& credits);
+    void setCreditsMultiplier(const double& mult);
+    void increaseCreditsMultiplier(const double& add);
+    void setShieldRegenMultiplier(const double& mult);
+    void increaseShieldRegenMultiplier(const double& add);
+    void setMaxShips(const int& max);
+    void increaseMaxShips(const int& add);
+
+    double getCredits() const;
+    double getCreditsMultiplier() const;
+    double getShieldRegenMultiplier() const;
+    int getMaxShips() const;
 };
 
 class Laser : public Weapon {
@@ -140,6 +153,13 @@ public:
     Battleship(const int& team);
 };
 
+class Shop {
+public:
+    static void buyCreditsMultiplier(TEAM& team);
+    static void buyShieldRegenMultiplier(TEAM& team);
+    static void buyMaxShips(TEAM& team);
+};
+
 class UI {
 public:
     static void listShips(const int& turn);
@@ -147,8 +167,9 @@ public:
     static void createShip(const int& turn);
     static void moveShip(const int& turn);
     static void shootTarget(const int& turn);
-    static void removeDestroyedShips();
-    static void refreshMoves();
+    static void removeDestroyedShips(const int& turn);
+    static void refreshMoves(const int& turn);
+    static void Shop(const int& turn);
 };
 
 #endif // BATTLESHIPS_H

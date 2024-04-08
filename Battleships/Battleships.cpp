@@ -7,6 +7,63 @@ TEAM::TEAM(const int& i) : credits(10), creditsPerTurnMultiplier(1), shieldRegen
     TEAM::shipList.push_back(new Frigate(i));
 }
 
+void TEAM::setCredits(const double& credits) {
+    this->credits = credits;
+}
+void TEAM::addCredits(const double& credits) {
+    this->credits += credits;
+}
+void TEAM::setCreditsMultiplier(const double& mult) {
+    creditsPerTurnMultiplier = mult;
+}
+void TEAM::increaseCreditsMultiplier(const double& add) {
+    creditsPerTurnMultiplier += add;
+}
+void TEAM::setShieldRegenMultiplier(const double& mult) {
+    shieldRegenMultiplier = mult;
+}
+void TEAM::increaseShieldRegenMultiplier(const double& add) {
+    shieldRegenMultiplier += add;
+}
+void TEAM::setMaxShips(const int& max) {
+    maxShips = max;
+}
+void TEAM::increaseMaxShips(const int& add) {
+    maxShips += add;
+}
+
+double TEAM::getCredits() const {
+    return credits;
+}
+double TEAM::getCreditsMultiplier() const {
+    return creditsPerTurnMultiplier;
+}
+double TEAM::getShieldRegenMultiplier() const {
+    return shieldRegenMultiplier;
+}
+int TEAM::getMaxShips() const {
+    return maxShips;
+}
+
+void Shop::buyCreditsMultiplier(TEAM& team) {
+    if (team.getCredits() >= 10) {
+        team.increaseCreditsMultiplier(0.5);
+        team.addCredits(-10);
+    }
+}
+void Shop::buyShieldRegenMultiplier(TEAM& team) {
+    if (team.getCredits() >= 20) {
+        team.increaseShieldRegenMultiplier(0.5);
+        team.addCredits(-20);
+    }
+}
+void Shop::buyMaxShips(TEAM& team) {
+    if (team.getCredits() >= 10) {
+        team.increaseMaxShips(5);
+        team.addCredits(-10);
+    }
+}
+
 Ship::Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& armourHeal, const int& team) :
     Name(Name), maxSpeed(maxSpeed), maxBodyPoints(maxBodyPoints), maxArmourPoints(maxArmourPoints), BodyPoints(maxBodyPoints), ArmourPoints(maxArmourPoints), crewCount(crewCount), armourHeal(armourHeal), team(team), madeMove(false) {
     switch (team)
@@ -331,6 +388,7 @@ void UI::mainMenu() {
             std::cout << "3. Shoot a target\n";
             std::cout << "4. LIST ships\n";
             std::cout << "5. Next turn\n";
+            std::cout << "6. Shop\n";
             std::cout << "Option: ";
             std::cin >> option;
             switch (option)
@@ -350,14 +408,46 @@ void UI::mainMenu() {
                 std::cin >> i;
                 break;
             case 5:
-                UI::refreshMoves();
+                UI::refreshMoves(turn);
                 turn++;
+                break;
+            case 6:
+                UI::Shop(turn);
                 break;
             default:
                 break;
             }
         } while (option != 0);
     } while (!isOver);
+}
+
+void UI::Shop(const int& turn){
+    int option = -1;
+    do {
+        system("cls");
+        std::cout << "Choose an upgrade:" << std::endl;
+        std::cout << "Your credits: " << LIST::Teams[turn]->getCredits() << std::endl;
+        std::cout << "1. Credits Multiplier(10)\n";
+        std::cout << "2. Shield Regeneration Multiplier(20)\n";
+        std::cout << "3. Max Ships(10)\n";
+        std::cout << "Back[0]\n";
+        std::cout << "Option: ";
+        std::cin >> option;
+        switch (option)
+        {
+        case 1:
+            Shop::buyCreditsMultiplier(*LIST::Teams[turn]);
+            break;
+        case 2:
+            Shop::buyShieldRegenMultiplier(*LIST::Teams[turn]);
+            break;
+        case 3:
+            Shop::buyMaxShips(*LIST::Teams[turn]);
+            break;
+        default:
+            break;
+        }
+    } while (option != 0);
 }
 
 void UI::createShip(const int& turn) {
@@ -449,14 +539,15 @@ void UI::shootTarget(const int& turn) {
         std::cin >> target;
         LIST::Teams[turn]->shipList[option1]->shootTheTarget(*LIST::Teams[team]->shipList[target]);
         LIST::Teams[turn]->shipList[option1]->makeMove();
-        UI::removeDestroyedShips();
+        UI::removeDestroyedShips(turn);
     }
 }
 
-void UI::removeDestroyedShips() {
+void UI::removeDestroyedShips(const int& turn) {
     for (TEAM* team : LIST::Teams) {
         for (auto it = team->shipList.begin(); it != team->shipList.end();) {
             if ((*it)->getBodyPoints() <= 0) {
+                LIST::Teams[turn]->addCredits(10);
                 delete* it;
                 it = team->shipList.erase(it);
             }
@@ -467,7 +558,8 @@ void UI::removeDestroyedShips() {
     }
 }
 
-void UI::refreshMoves() {
+void UI::refreshMoves(const int& turn) {
+    LIST::Teams[turn]->addCredits(10 * LIST::Teams[turn]->getCreditsMultiplier());
     for (TEAM* team : LIST::Teams) {
         for (Ship* ship : team->shipList) {
             ship->refreshMove();
