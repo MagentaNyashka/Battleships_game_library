@@ -7,8 +7,34 @@ TEAM::TEAM(const int& i) : credits(10), creditsPerTurnMultiplier(1), shieldRegen
     TEAM::shipList.push_back(new Frigate(i));
 }
 
-Ship::Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& x, const double& y, const double& z, const double& armourHeal, const int& team) :
-    Name(Name), maxSpeed(maxSpeed), maxBodyPoints(maxBodyPoints), maxArmourPoints(maxArmourPoints), BodyPoints(maxBodyPoints), ArmourPoints(maxArmourPoints), crewCount(crewCount), shipCoordinates({ x,y,z }), armourHeal(armourHeal), team(team) {}
+Ship::Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& armourHeal, const int& team) :
+    Name(Name), maxSpeed(maxSpeed), maxBodyPoints(maxBodyPoints), maxArmourPoints(maxArmourPoints), BodyPoints(maxBodyPoints), ArmourPoints(maxArmourPoints), crewCount(crewCount), armourHeal(armourHeal), team(team), madeMove(false) {
+    switch (team)
+    {
+    case RED:
+        shipCoordinates.x = -100;
+        shipCoordinates.y = -100;
+        shipCoordinates.z = 0;
+        break;
+    case GREEN:
+        shipCoordinates.x = -100;
+        shipCoordinates.y = 100;
+        shipCoordinates.z = 0;
+        break;
+    case BLUE:
+        shipCoordinates.x = 100;
+        shipCoordinates.y = -100;
+        shipCoordinates.z = 0;
+        break;
+    case YELLOW:
+        shipCoordinates.x = 100;
+        shipCoordinates.y = 100;
+        shipCoordinates.z = 0;
+        break;
+    default:
+        break;
+    }
+}
 
 void Ship::Move(double& x, double& y, double& z) {
     if (!madeMove) {
@@ -85,8 +111,28 @@ std::string Ship::info() const {
     armourInfo += "]";
 
     std::string coordinates = "{" + std::to_string(shipCoordinates.x) + " " + std::to_string(shipCoordinates.y) + " " + std::to_string(shipCoordinates.z) + "}";
-    std::string ifMadeMove = (madeMove) ? "[+] " : "[#] ";
-    return " " + ifMadeMove + Name + ": " + bodyInfo + " " + armourInfo + " " + coordinates + " [" + std::to_string(BodyPoints) + "/" + std::to_string(maxBodyPoints) + "] " + " [" + std::to_string(ArmourPoints) + "/" + std::to_string(maxArmourPoints) + "]" + " MAX_SPEED: " + std::to_string(maxSpeed);
+    std::string ifMadeMove = (madeMove) ? "[#] " : "[+] ";
+    std::string teamTag;
+    switch (team)
+    {
+    case RED:
+        teamTag = "[R]";
+        break;
+    case GREEN:
+        teamTag = "[G]";
+        break;
+    case BLUE:
+        teamTag = "[B]";
+
+        break;
+    case YELLOW:
+        teamTag = "[Y]";
+
+        break;
+    default:
+        break;
+    }
+    return " " + teamTag + " " + ifMadeMove + Name + ": " + bodyInfo + " " + armourInfo + " " + coordinates + " [" + std::to_string(BodyPoints) + "/" + std::to_string(maxBodyPoints) + "] " + " [" + std::to_string(ArmourPoints) + "/" + std::to_string(maxArmourPoints) + "]" + " MAX_SPEED: " + std::to_string(maxSpeed);
 }
 
 void Ship::refreshMove() {
@@ -179,12 +225,12 @@ void NUKER::shoot(const double& Distance, class Ship& target) {
     target.getHit(damage);
 }
 
-Frigate::Frigate(const int& team) : Ship("Frigate", 100, 100, 100, 3, 100, 100, 100, 10, team) {
+Frigate::Frigate(const int& team) : Ship("Frigate", 100, 100, 100, 3, 10, team) {
     Weapons.push_back(new Turret(500, 10, 10, 100));
     Weapons.push_back(new Laser(20, 5));
 }
 
-Armadillo::Armadillo(const int& team) : Ship("Armadillo", 25, 400, 800, 6, -100, -100, -100, 100, team) {
+Armadillo::Armadillo(const int& team) : Ship("Armadillo", 25, 400, 800, 6, 100, team) {
     Weapons.push_back(new Turret(500, 10, 10, 100));
     Weapons.push_back(new Turret(500, 10, 10, 100));
     Weapons.push_back(new Turret(500, 10, 10, 100));
@@ -195,7 +241,7 @@ Armadillo::Armadillo(const int& team) : Ship("Armadillo", 25, 400, 800, 6, -100,
     Weapons.push_back(new Turret(500, 10, 10, 100));
 }
 
-Destroyer::Destroyer(const int& team) : Ship("Destroyer", 40, 200, 400, 7, 0, 0, 0, 50, team) {
+Destroyer::Destroyer(const int& team) : Ship("Destroyer", 40, 200, 400, 7, 50, team) {
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
@@ -206,7 +252,7 @@ Destroyer::Destroyer(const int& team) : Ship("Destroyer", 40, 200, 400, 7, 0, 0,
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
 }
 
-Battleship::Battleship(const int& team) : Ship("Cutie >///<", 500, 1000, 2000, 10, 100, -100, -100, 200, team) {
+Battleship::Battleship(const int& team) : Ship("Cutie >///<", 500, 1000, 2000, 10, 200, team) {
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
     Weapons.push_back(new RocketLauncher(100, 2, 50, 100));
@@ -224,9 +270,17 @@ Battleship::Battleship(const int& team) : Ship("Cutie >///<", 500, 1000, 2000, 1
 
 void UI::listShips(const int& turn) {
     system("cls");
+    for (TEAM* team : LIST::Teams) {
+        for (int i = 0; i < team->shipList.size(); i++) {
+            std::cout << "[" << i << "]" << team->shipList[i]->info() << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    /*
     for (int i = 0; i < LIST::Teams[turn]->shipList.size(); i++) {
         std::cout << "[" << i << "]" << LIST::Teams[turn]->shipList[i]->info() << std::endl;
     }
+    */
 }
 
 void UI::mainMenu() {
@@ -245,31 +299,31 @@ void UI::mainMenu() {
                 isOver = true;
             }
         }
-        if (turn >= LIST::teamsCount) {
-            turn = RED;
-        }
         std::string current_team;
-        switch (turn)
-        {
-        case RED:
-            current_team = "RED";
-            break;
-        case GREEN:
-            current_team = "GREEN";
-            break;
-        case BLUE:
-            current_team = "BLUE";
-            break;
-        case YELLOW:
-            current_team = "YELLOW";
-            break;
-        default:
-            break;
-        }
         int option = -1;
         int i = 0;
         do {
             system("cls");
+            if (turn >= LIST::teamsCount) {
+                turn = RED;
+            }
+            switch (turn)
+            {
+            case RED:
+                current_team = "RED";
+                break;
+            case GREEN:
+                current_team = "GREEN";
+                break;
+            case BLUE:
+                current_team = "BLUE";
+                break;
+            case YELLOW:
+                current_team = "YELLOW";
+                break;
+            default:
+                break;
+            }
             std::cout << current_team << " turn" << std::endl;
             std::cout << "Choose your move: " << std::endl;
             std::cout << "1. Create a ship\n";
@@ -360,35 +414,43 @@ void UI::shootTarget(const int& turn) {
     std::cout << "Choose a ship: ";
     std::cin >> option1;
     system("cls");
-     int team = -1;
-     std::cout << "Choose a team: \n";
-     for (int i = 0; i < LIST::Teams.size(); i++){
-         if (i != turn) {
-             switch (i)
-             {
-             case RED:
-                 std::cout << "0. RED" << std::endl;
-             case GREEN:
-                 std::cout << "1. GREEN" << std::endl;
-             case BLUE:
-                 std::cout << "2. BLUE" << std::endl;
-             case YELLOW:
-                 std::cout << "3. YELLOW" << std::endl;
-             default:
-                 break;
-             }
-         }
-     }
-     std::cout << "Team: ";
-     std::cin >> team;
-     std::cout << "Choose a target: ";
-     listShips(team);
-     std::cout << "Target: ";
-     int target = -1;
-     std::cin >> target;
-     LIST::Teams[turn]->shipList[option1]->shootTheTarget(*LIST::Teams[team]->shipList[target]);
-     LIST::Teams[turn]->shipList[option1]->makeMove();
-     UI::removeDestroyedShips();
+    int team = -1;
+    std::cout << "Choose a team: \n";
+    switch (LIST::Teams.size() - 1)
+        {
+        case RED:
+            std::cout << "0. RED" << std::endl;
+            break;
+        case GREEN:
+            std::cout << "0. RED" << std::endl;
+            std::cout << "1. GREEN" << std::endl;
+            break;
+        case BLUE:
+            std::cout << "0. RED" << std::endl;
+            std::cout << "1. GREEN" << std::endl;
+            std::cout << "2. BLUE" << std::endl;
+            break;
+        case YELLOW:
+            std::cout << "0. RED" << std::endl;
+            std::cout << "1. GREEN" << std::endl;
+            std::cout << "2. BLUE" << std::endl;
+            std::cout << "3. YELLOW" << std::endl;
+            break;
+        default:
+            break;
+    }
+    std::cout << "Team: ";
+    std::cin >> team;
+    if (team >= 0 && team < LIST::Teams.size()) {
+        std::cout << "Choose a target: ";
+        listShips(team);
+        std::cout << "Target: ";
+        int target = -1;
+        std::cin >> target;
+        LIST::Teams[turn]->shipList[option1]->shootTheTarget(*LIST::Teams[team]->shipList[target]);
+        LIST::Teams[turn]->shipList[option1]->makeMove();
+        UI::removeDestroyedShips();
+    }
 }
 
 void UI::removeDestroyedShips() {

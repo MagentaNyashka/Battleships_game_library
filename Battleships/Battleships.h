@@ -43,7 +43,7 @@ protected:
     bool madeMove;
     int team;
 public:
-    Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& x, const double& y, const double& z, const double& armourHeal, const int& team);
+    Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& armourHeal, const int& team);
     void Move(double& x, double& y, double& z);
     double getDistance(class Ship& target) const;
     void shootTheTarget(class Ship& target);
