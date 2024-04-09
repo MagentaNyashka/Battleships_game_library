@@ -573,7 +573,7 @@ void UI::removeDestroyedShips(const int& turn) {
     for (TEAM* team : LIST::Teams) {
         for (auto it = team->shipList.begin(); it != team->shipList.end();) {
             if ((*it)->getBodyPoints() <= 0) {
-                LIST::Teams[turn]->addCredits(10);
+                LIST::Teams[turn]->addCredits(10 * LIST::Teams[turn]->getCreditsMultiplier());
                 delete* it;
                 it = team->shipList.erase(it);
             }
