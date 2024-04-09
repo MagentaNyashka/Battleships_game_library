@@ -157,7 +157,7 @@ double Ship::getBodyPoints() {
 void Ship::Heal() {
     ArmourPoints += armourHealPerTurn * LIST::Teams[team]->getShieldRegenMultiplier();
     if (ArmourPoints > maxArmourPoints) {
-        ArmourPoints == maxArmourPoints;
+        ArmourPoints = maxArmourPoints;
     }
 }
 
@@ -466,25 +466,38 @@ void UI::Shop(const int& turn){
 void UI::createShip(const int& turn) {
     system("cls");
     int option = -1;
+    std::cout << "Credits: " << LIST::Teams[turn]->getCredits() << std::endl;
     std::cout << "Choose a ship to create:" << std::endl;
-    std::cout << "1. Frigate\n";
-    std::cout << "2. Armadillo\n";
-    std::cout << "3. Destroyer\n";
+    std::cout << "1. Frigate(10)\n";
+    std::cout << "2. Armadillo(25)\n";
+    std::cout << "3. Destroyer(50)\n";
     std::cout << "Option: ";
     std::cin >> option;
     switch (option)
     {
     case 1:
-        LIST::Teams[turn]->shipList.push_back(new Frigate(turn));
+        if (LIST::Teams[turn]->getCredits() >= 10) {
+            LIST::Teams[turn]->addCredits(-10);
+            LIST::Teams[turn]->shipList.push_back(new Frigate(turn));
+        }
         break;
     case 2:
-        LIST::Teams[turn]->shipList.push_back(new Armadillo(turn));
+        if (LIST::Teams[turn]->getCredits() >= 25) {
+            LIST::Teams[turn]->addCredits(-25);
+            LIST::Teams[turn]->shipList.push_back(new Armadillo(turn));
+        }        
         break;
     case 3:
-        LIST::Teams[turn]->shipList.push_back(new Destroyer(turn));
+        if (LIST::Teams[turn]->getCredits() >= 50) {
+            LIST::Teams[turn]->addCredits(-50);
+            LIST::Teams[turn]->shipList.push_back(new Destroyer(turn));
+        }        
         break;
     case 4:
-        LIST::Teams[turn]->shipList.push_back(new Battleship(turn));
+        if (LIST::Teams[turn]->getCredits() >= 150) {
+            LIST::Teams[turn]->addCredits(-150);
+            LIST::Teams[turn]->shipList.push_back(new Battleship(turn));
+        }        
         break;
     default:
         break;
@@ -494,7 +507,7 @@ void UI::createShip(const int& turn) {
 void UI::moveShip(const int& turn) {
     system("cls");
     int option = -1;
-    listShips(turn);
+    listShips();
     std::cout << "Choose a ship: ";
     std::cin >> option;
     if (option < 0 || option >= LIST::Teams[turn]->shipList.size()) {
