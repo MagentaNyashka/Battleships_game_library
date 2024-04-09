@@ -39,7 +39,7 @@ protected:
     };
     Coordinates shipCoordinates;
     std::vector<Weapon*> Weapons;
-    double armourHeal;
+    double armourHealPerTurn;
     bool madeMove;
     int team;
 public:
@@ -55,6 +55,7 @@ public:
     void refreshMove();
     bool moveStatus() const;
     void makeMove();
+    std::string getType() const;
     ~Ship();
 };
 
@@ -163,6 +164,7 @@ public:
 class UI {
 public:
     static void listShips(const int& turn);
+    static void listShips();
     static void mainMenu();
     static void createShip(const int& turn);
     static void moveShip(const int& turn);

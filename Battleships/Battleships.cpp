@@ -65,7 +65,7 @@ void Shop::buyMaxShips(TEAM& team) {
 }
 
 Ship::Ship(const std::string Name, const double& maxSpeed, const double& maxBodyPoints, const double& maxArmourPoints, const int& crewCount, const double& armourHeal, const int& team) :
-    Name(Name), maxSpeed(maxSpeed), maxBodyPoints(maxBodyPoints), maxArmourPoints(maxArmourPoints), BodyPoints(maxBodyPoints), ArmourPoints(maxArmourPoints), crewCount(crewCount), armourHeal(armourHeal), team(team), madeMove(false) {
+    Name(Name), maxSpeed(maxSpeed), maxBodyPoints(maxBodyPoints), maxArmourPoints(maxArmourPoints), BodyPoints(maxBodyPoints), ArmourPoints(maxArmourPoints), crewCount(crewCount), armourHealPerTurn(armourHeal), team(team), madeMove(false) {
     switch (team)
     {
     case RED:
@@ -123,9 +123,11 @@ void Ship::makeMove() {
 }
 
 void Ship::shootTheTarget(class Ship& target) {
-    double Distance = getDistance(target);
-    for (auto weapon : Weapons) {
-        weapon->shoot(Distance, target);
+    if (!madeMove) {
+        double Distance = getDistance(target);
+        for (auto weapon : Weapons) {
+            weapon->shoot(Distance, target);
+        }
     }
 }
 
@@ -140,6 +142,10 @@ void Ship::getHit(const double& damage) {
     }
 }
 
+std::string Ship::getType() const {
+    return Name;
+}
+
 double Ship::getSpeed() {
     return maxSpeed;
 }
@@ -149,9 +155,9 @@ double Ship::getBodyPoints() {
 }
 
 void Ship::Heal() {
-    ArmourPoints += armourHeal;
+    ArmourPoints += armourHealPerTurn * LIST::Teams[team]->getShieldRegenMultiplier();
     if (ArmourPoints > maxArmourPoints) {
-        ArmourPoints = maxArmourPoints;
+        ArmourPoints == maxArmourPoints;
     }
 }
 
@@ -268,7 +274,10 @@ void Turret::shoot(const double& Distance, class Ship& target) {
 NUKER::NUKER(const double& damage) : damage(damage) {}
 
 bool NUKER::isHitting(const double& Distance, class Ship& target) const {
-    return true;
+    if (target.getType() != "Armadillo" || target.getType() != "Cutie >///<") {
+        return true;
+    }
+    return false;
 }
 
 void NUKER::shoot(const double& Distance, class Ship& target) {
@@ -332,11 +341,16 @@ void UI::listShips(const int& turn) {
        std::cout << "[" << i << "]" << team->shipList[i]->info() << std::endl;
     }
     std::cout << std::endl;
-    /*
-    for (int i = 0; i < LIST::Teams[turn]->shipList.size(); i++) {
-        std::cout << "[" << i << "]" << LIST::Teams[turn]->shipList[i]->info() << std::endl;
+}
+
+void UI::listShips() {
+    system("cls");
+    for (TEAM* team : LIST::Teams) {
+        for (int i = 0; i < team->shipList.size(); i++) {
+            std::cout << "[" << i << "]" << team->shipList[i]->info() << std::endl;
+        }
+        std::cout << std::endl;
     }
-    */
 }
 
 void UI::mainMenu() {
@@ -402,7 +416,7 @@ void UI::mainMenu() {
                 shootTarget(turn);
                 break;
             case 4:
-                listShips(turn);
+                listShips();
                 std::cout << "Back[0]: ";
                 std::cin >> i;
                 break;
@@ -561,6 +575,7 @@ void UI::refreshMoves(const int& turn) {
     LIST::Teams[turn]->addCredits(10 * LIST::Teams[turn]->getCreditsMultiplier());
     for (TEAM* team : LIST::Teams) {
         for (Ship* ship : team->shipList) {
+            ship->Heal();
             ship->refreshMove();
         }
     }
