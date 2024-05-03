@@ -173,7 +173,7 @@ std::ostream& operator<<(std::ostream& os, const Ship& ship) {
     return os;
 }
 
-Ship Ship::operator+(Ship& ship2) {
+void Ship::operator+(Ship& ship2) {
     if (Name == ship2.Name) {
         LIST::Teams[this->team]->shipList.push_back(new Armadillo(this->team));
         this->~Ship();

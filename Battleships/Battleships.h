@@ -62,7 +62,7 @@ public:
     void makeMove();
     std::string getType() const;
     friend std::ostream& operator<<(std::ostream& os, const Ship& ship);
-    Ship operator+(Ship& ship2);
+    void operator+(Ship& ship2);
     ~Ship();
 };
 
