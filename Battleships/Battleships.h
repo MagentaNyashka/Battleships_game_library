@@ -11,6 +11,10 @@
 #include <string>
 #include <cassert>
 
+struct o_o {
+    std::string O_o = "o_o";
+};
+
 enum teams
 {
     RED = 0, GREEN, BLUE, YELLOW
@@ -51,11 +55,14 @@ public:
     double getSpeed();
     double getBodyPoints();
     void Heal();
+    void Heal(const double& heal);
     std::string info() const;
     void refreshMove();
     bool moveStatus() const;
     void makeMove();
     std::string getType() const;
+    friend std::ostream& operator<<(std::ostream& os, const Ship& ship);
+    Ship operator+(Ship& ship2);
     ~Ship();
 };
 

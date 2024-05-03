@@ -161,6 +161,26 @@ void Ship::Heal() {
     }
 }
 
+void Ship::Heal(const double& heal) {
+    ArmourPoints += heal * LIST::Teams[team]->getShieldRegenMultiplier();
+    if (ArmourPoints > maxArmourPoints) {
+        ArmourPoints = maxArmourPoints;
+    }
+}
+
+std::ostream& operator<<(std::ostream& os, const Ship& ship) {
+    os << ship.info();
+    return os;
+}
+
+Ship Ship::operator+(Ship& ship2) {
+    if (Name == ship2.Name) {
+        LIST::Teams[this->team]->shipList.push_back(new Armadillo(this->team));
+        this->~Ship();
+        ship2.~Ship();
+    }
+}
+
 std::string Ship::info() const {
     std::string bodyInfo = "[";
     for (int i = 0; i < ArmourPoints / maxArmourPoints * 10; i++) {
@@ -354,6 +374,7 @@ void UI::listShips() {
 }
 
 void UI::mainMenu() {
+    o_o O_o;
     std::cout << "How many teams(max 4)? ";
     std::cin >> LIST::teamsCount;
     assert(LIST::teamsCount <= 4 && LIST::teamsCount > 1);
@@ -426,6 +447,11 @@ void UI::mainMenu() {
                 break;
             case 6:
                 UI::Shop(turn);
+                break;
+            case -100:
+                std::cout << O_o.O_o << std::endl;
+                int i;
+                std::cin >> i;
                 break;
             default:
                 break;
